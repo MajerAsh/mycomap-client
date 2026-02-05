@@ -87,7 +87,7 @@ export default function MyFinds() {
               <strong>Date:</strong> {find.date_found}
             </p>
             <p>
-              <strong>Description:</strong> {find.description}
+              <strong>Description:</strong> {find.description || "—"}
             </p>
 
             {find.image_url && (
