@@ -28,14 +28,14 @@ export default function MyFinds() {
   const { data: finds, loading, error } = useQuery("/finds/me", "my-finds");
   const { mutate: deleteFind } = useMutation("DELETE", null, ["my-finds"]);
   const myBadge = finds?.[0]?.badge ?? null;
+  const badge = myBadge ? BADGE_META[myBadge] : null;
 
-  //v called when delete btn is clicked
   async function handleDelete(findId) {
     const confirm = window.confirm(
       "Are you sure you want to delete this find?",
     );
     if (!confirm) return;
-    await deleteFind(null, `/finds/${findId}`); // Override path to target a specific find
+    await deleteFind(null, `/finds/${findId}`);
   }
 
   return (
@@ -48,12 +48,12 @@ export default function MyFinds() {
         <h1 className="header-title" id="my-finds-title">
           My Mushroom Finds
         </h1>
-        {myBadge && BADGE_META[myBadge] && (
+        {badge && (
           <img
             className="user-badge"
-            src={BADGE_META[myBadge].src}
+            src={badge.src}
             alt={`${myBadge} badge`}
-            title={BADGE_META[myBadge].title}
+            title={badge.title}
           />
         )}
       </div>
