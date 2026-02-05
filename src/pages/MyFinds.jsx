@@ -6,36 +6,28 @@ import SpeciesFacts from "../components/SpeciesFacts";
 import "../styles/theme.css";
 import "../styles/finds.css";
 
+const BADGE_META = {
+  "Myco Master": {
+    src: "/svgs/MycoMaster.svg",
+    title: "The Myco Master badge!\nMyco masters have\n25+ distinct finds",
+  },
+  "Seasoned Forager": {
+    src: "/svgs/seasonedforager.svg",
+    title:
+      "The Seasoned Forager badge!\nSeasoned foragers have\n10+ distinct finds",
+  },
+  Fruiting: {
+    src: "/svgs/fruiting.svg",
+    title:
+      "The Fruiting Forager badge!\nFruiting foragers have five or\nmore distinct finds",
+  },
+};
+
 // "my-finds" is used as an invalidation tag after create/edit/delete
 export default function MyFinds() {
   const { data: finds, loading, error } = useQuery("/finds/me", "my-finds");
   const { mutate: deleteFind } = useMutation("DELETE", null, ["my-finds"]);
   const myBadge = finds?.[0]?.badge ?? null;
-
-  const badgeMeta = (label) => {
-    switch (label) {
-      case "Myco Master":
-        return {
-          src: "/svgs/MycoMaster.svg",
-          title:
-            "The Myco Master badge!\nMyco masters have\n25+ distinct finds",
-        };
-      case "Seasoned Forager":
-        return {
-          src: "/svgs/seasonedforager.svg",
-          title:
-            "The Seasoned Forager badge!\nSeasoned foragers have\n10+ distinct finds",
-        };
-      case "Fruiting":
-        return {
-          src: "/svgs/fruiting.svg",
-          title:
-            "The Fruiting Forager badge!\nFruiting foragers have five or\nmore distinct finds",
-        };
-      default:
-        return null;
-    }
-  };
 
   //v called when delete btn is clicked
   async function handleDelete(findId) {
@@ -56,18 +48,14 @@ export default function MyFinds() {
         <h1 className="header-title" id="my-finds-title">
           My Mushroom Finds
         </h1>
-        {myBadge &&
-          (() => {
-            const m = badgeMeta(myBadge);
-            return m ? (
-              <img
-                className="user-badge"
-                src={m.src}
-                alt={`${myBadge} badge`}
-                title={m.title}
-              />
-            ) : null;
-          })()}
+        {myBadge && BADGE_META[myBadge] && (
+          <img
+            className="user-badge"
+            src={BADGE_META[myBadge].src}
+            alt={`${myBadge} badge`}
+            title={BADGE_META[myBadge].title}
+          />
+        )}
       </div>
 
       {loading && <p aria-live="polite">Loading...</p>}
