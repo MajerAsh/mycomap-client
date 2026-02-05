@@ -1,49 +1,47 @@
 import { Link } from "react-router";
 import useQuery from "../api/useQuery";
-import useMutation from "../api/useMutation"; //hook to create DELETE req
+import useMutation from "../api/useMutation";
 import SpeciesFacts from "../components/SpeciesFacts";
+import { API } from "../api/ApiContext";
 
 import "../styles/theme.css";
 import "../styles/finds.css";
+
+const BADGE_META = {
+  "Myco Master": {
+    src: "/svgs/MycoMaster.svg",
+    title: "The Myco Master badge!\nMyco masters have\n25+ distinct finds",
+  },
+  "Seasoned Forager": {
+    src: "/svgs/seasonedforager.svg",
+    title:
+      "The Seasoned Forager badge!\nSeasoned foragers have\n10+ distinct finds",
+  },
+  Fruiting: {
+    src: "/svgs/fruiting.svg",
+    title:
+      "The Fruiting Forager badge!\nFruiting foragers have five or\nmore distinct finds",
+  },
+};
+
+function imgSrc(url) {
+  if (!url) return null;
+  return url.startsWith("http")
+    ? url
+    : `${API}${url.startsWith("/") ? "" : "/"}${url}`;
+}
 
 // "my-finds" is used as an invalidation tag after create/edit/delete
 export default function MyFinds() {
   const { data: finds, loading, error } = useQuery("/finds/me", "my-finds");
   const { mutate: deleteFind } = useMutation("DELETE", null, ["my-finds"]);
   const myBadge = finds?.[0]?.badge ?? null;
+  const badge = myBadge ? BADGE_META[myBadge] : null;
 
-  const badgeMeta = (label) => {
-    switch (label) {
-      case "Myco Master":
-        return {
-          src: "/svgs/MycoMaster.svg",
-          title:
-            "The Myco Master badge!\nMyco masters have\n25+ distinct finds",
-        };
-      case "Seasoned Forager":
-        return {
-          src: "/svgs/seasonedforager.svg",
-          title:
-            "The Seasoned Forager badge!\nSeasoned foragers have\n10+ distinct finds",
-        };
-      case "Fruiting":
-        return {
-          src: "/svgs/fruiting.svg",
-          title:
-            "The Fruiting Forager badge!\nFruiting foragers have five or\nmore distinct finds",
-        };
-      default:
-        return null;
-    }
-  };
-
-  //v called when delete btn is clicked
   async function handleDelete(findId) {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this find?"
-    );
-    if (!confirm) return;
-    await deleteFind(null, `/finds/${findId}`); // Override path to target a specific find
+    const ok = window.confirm("Are you sure you want to delete this find?");
+    if (!ok) return;
+    await deleteFind(null, `/finds/${findId}`);
   }
 
   return (
@@ -56,18 +54,14 @@ export default function MyFinds() {
         <h1 className="header-title" id="my-finds-title">
           My Mushroom Finds
         </h1>
-        {myBadge &&
-          (() => {
-            const m = badgeMeta(myBadge);
-            return m ? (
-              <img
-                className="user-badge"
-                src={m.src}
-                alt={`${myBadge} badge`}
-                title={m.title}
-              />
-            ) : null;
-          })()}
+        {badge && (
+          <img
+            className="user-badge"
+            src={badge.src}
+            alt={`${myBadge} badge`}
+            title={badge.title}
+          />
+        )}
       </div>
 
       {loading && <p aria-live="polite">Loading...</p>}
@@ -93,21 +87,16 @@ export default function MyFinds() {
               <strong>Date:</strong> {find.date_found}
             </p>
             <p>
-              <strong>Description:</strong> {find.description}
+              <strong>Description:</strong> {find.description || "—"}
             </p>
 
             {find.image_url && (
               <div className="media">
                 <img
-                  src={
-                    find.image_url?.startsWith("http")
-                      ? find.image_url
-                      : `${import.meta.env.VITE_API_URL}${find.image_url}`
-                  }
+                  src={imgSrc(find.image_url)}
                   alt={`${find.species ?? "Mushroom"} photo`}
                   loading="lazy"
                   onError={(e) => {
-                    // avoid infinite loop if placeholder missing
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = "/svgs/sadmushroom.png";
                   }}
@@ -128,7 +117,7 @@ export default function MyFinds() {
               const hasCoords = find.latitude != null && find.longitude != null;
               const coords = hasCoords
                 ? `(${Number(find.latitude).toFixed(5)}, ${Number(
-                    find.longitude
+                    find.longitude,
                   ).toFixed(5)})`
                 : null;
               const label = find.location?.trim();

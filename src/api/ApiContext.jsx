@@ -1,53 +1,67 @@
 // API client with auth header support + simple tag invalidation
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useCallback, useMemo } from "react";
 import { useAuth } from "../auth/AuthContext";
 
 export const API = import.meta.env.VITE_API_URL;
 
-const ApiContext = createContext();
+function joinUrl(base, path) {
+  const b = base.endsWith("/") ? base.slice(0, -1) : base;
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${b}${p}`;
+}
+
+function getErrorMessage(result) {
+  if (typeof result === "string") return result;
+  return result.error || result.message || JSON.stringify(result);
+}
+
+const ApiContext = createContext(null);
 
 export function ApiProvider({ children }) {
-  //gets current user's auth token from AuthContext
   const { token } = useAuth();
 
-  // Generic API request helper
-  const request = async (resource, options = {}, isFormData = false) => {
-    const headers = {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
-      ...(options.headers || {}),
-    };
+  const request = useCallback(
+    async (resource, options = {}, isFormData = false) => {
+      const headers = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(!isFormData ? { "Content-Type": "application/json" } : {}),
+        ...(options.headers || {}),
+      };
 
-    const response = await fetch(API + resource, {
-      ...options,
-      headers,
-    });
+      const response = await fetch(joinUrl(API, resource), {
+        ...options,
+        headers,
+      });
 
-    const isJson = /json/.test(response.headers.get("Content-Type") || "");
-    const result = isJson ? await response.json() : await response.text();
+      const isJson = /json/.test(response.headers.get("Content-Type") || "");
+      const result = isJson ? await response.json() : await response.text();
 
-    if (!response.ok) throw Error(result);
-    return result;
-  };
+      if (!response.ok) throw new Error(getErrorMessage(result));
+      return result;
+    },
+    [token],
+  );
 
-  //tag-based cache invalidation system:
-  const [tags, setTags] = useState({});
+  const tagsRef = useRef({});
 
-  const provideTag = (tag, query) => {
-    setTags((prev) => ({ ...prev, [tag]: query }));
-  };
+  const provideTag = useCallback((tag, query) => {
+    tagsRef.current[tag] = query;
+  }, []);
 
-  const invalidateTags = (tagsToInvalidate) => {
+  const invalidateTags = useCallback((tagsToInvalidate) => {
     const list = Array.isArray(tagsToInvalidate)
       ? tagsToInvalidate
       : tagsToInvalidate
-      ? [tagsToInvalidate]
-      : [];
-    list.forEach((tag) => tags[tag]?.());
-  };
+        ? [tagsToInvalidate]
+        : [];
+    list.forEach((tag) => tagsRef.current[tag]?.());
+  }, []);
 
-  const value = { request, provideTag, invalidateTags };
+  const value = useMemo(
+    () => ({ request, provideTag, invalidateTags }),
+    [request, provideTag, invalidateTags],
+  );
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }
 
