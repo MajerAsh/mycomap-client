@@ -1,6 +1,6 @@
 // API client with auth header support + simple tag invalidation
 
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useRef, useCallback, useMemo } from "react";
 import { useAuth } from "../auth/AuthContext";
 
 export const API = import.meta.env.VITE_API_URL;
@@ -10,42 +10,48 @@ const ApiContext = createContext();
 export function ApiProvider({ children }) {
   const { token } = useAuth();
 
-  const request = async (resource, options = {}, isFormData = false) => {
-    const headers = {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
-      ...(options.headers || {}),
-    };
+  const request = useCallback(
+    async (resource, options = {}, isFormData = false) => {
+      const headers = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(!isFormData ? { "Content-Type": "application/json" } : {}),
+        ...(options.headers || {}),
+      };
 
-    const response = await fetch(API + resource, {
-      ...options,
-      headers,
-    });
+      const response = await fetch(API + resource, {
+        ...options,
+        headers,
+      });
 
-    const isJson = /json/.test(response.headers.get("Content-Type") || "");
-    const result = isJson ? await response.json() : await response.text();
+      const isJson = /json/.test(response.headers.get("Content-Type") || "");
+      const result = isJson ? await response.json() : await response.text();
 
-    if (!response.ok) throw Error(result);
-    return result;
-  };
+      if (!response.ok) throw Error(result);
+      return result;
+    },
+    [token],
+  );
 
   //tag-based cache invalidation system:
   const tagsRef = useRef({});
 
-  const provideTag = (tag, query) => {
+  const provideTag = useCallback((tag, query) => {
     tagsRef.current[tag] = query;
-  };
+  }, []);
 
-  const invalidateTags = (tagsToInvalidate) => {
+  const invalidateTags = useCallback((tagsToInvalidate) => {
     const list = Array.isArray(tagsToInvalidate)
       ? tagsToInvalidate
       : tagsToInvalidate
         ? [tagsToInvalidate]
         : [];
     list.forEach((tag) => tagsRef.current[tag]?.());
-  };
+  }, []);
 
-  const value = { request, provideTag, invalidateTags };
+  const value = useMemo(
+    () => ({ request, provideTag, invalidateTags }),
+    [request, provideTag, invalidateTags],
+  );
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }
 
