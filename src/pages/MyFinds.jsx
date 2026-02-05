@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import useQuery from "../api/useQuery";
 import useMutation from "../api/useMutation";
 import SpeciesFacts from "../components/SpeciesFacts";
+import { API } from "../api/ApiContext";
 
 import "../styles/theme.css";
 import "../styles/finds.css";
@@ -22,6 +23,13 @@ const BADGE_META = {
       "The Fruiting Forager badge!\nFruiting foragers have five or\nmore distinct finds",
   },
 };
+
+function imgSrc(url) {
+  if (!url) return null;
+  return url.startsWith("http")
+    ? url
+    : `${API}${url.startsWith("/") ? "" : "/"}${url}`;
+}
 
 // "my-finds" is used as an invalidation tag after create/edit/delete
 export default function MyFinds() {
@@ -85,11 +93,7 @@ export default function MyFinds() {
             {find.image_url && (
               <div className="media">
                 <img
-                  src={
-                    find.image_url?.startsWith("http")
-                      ? find.image_url
-                      : `${import.meta.env.VITE_API_URL}${find.image_url}`
-                  }
+                  src={imgSrc(find.image_url)}
                   alt={`${find.species ?? "Mushroom"} photo`}
                   loading="lazy"
                   onError={(e) => {
