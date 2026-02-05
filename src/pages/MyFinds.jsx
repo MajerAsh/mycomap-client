@@ -95,7 +95,6 @@ export default function MyFinds() {
                   alt={`${find.species ?? "Mushroom"} photo`}
                   loading="lazy"
                   onError={(e) => {
-                    // avoid infinite loop if placeholder missing
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = "/svgs/sadmushroom.png";
                   }}
