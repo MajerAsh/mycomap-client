@@ -5,6 +5,12 @@ import { useAuth } from "../auth/AuthContext";
 
 export const API = import.meta.env.VITE_API_URL;
 
+function joinUrl(base, path) {
+  const b = base.endsWith("/") ? base.slice(0, -1) : base;
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${b}${p}`;
+}
+
 const ApiContext = createContext();
 
 export function ApiProvider({ children }) {
@@ -18,7 +24,7 @@ export function ApiProvider({ children }) {
         ...(options.headers || {}),
       };
 
-      const response = await fetch(API + resource, {
+      const response = await fetch(joinUrl(API, resource), {
         ...options,
         headers,
       });
