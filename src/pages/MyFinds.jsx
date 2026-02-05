@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import useQuery from "../api/useQuery";
-import useMutation from "../api/useMutation"; //hook to create DELETE req
+import useMutation from "../api/useMutation";
 import SpeciesFacts from "../components/SpeciesFacts";
 
 import "../styles/theme.css";
@@ -40,7 +40,7 @@ export default function MyFinds() {
   //v called when delete btn is clicked
   async function handleDelete(findId) {
     const confirm = window.confirm(
-      "Are you sure you want to delete this find?"
+      "Are you sure you want to delete this find?",
     );
     if (!confirm) return;
     await deleteFind(null, `/finds/${findId}`); // Override path to target a specific find
@@ -128,7 +128,7 @@ export default function MyFinds() {
               const hasCoords = find.latitude != null && find.longitude != null;
               const coords = hasCoords
                 ? `(${Number(find.latitude).toFixed(5)}, ${Number(
-                    find.longitude
+                    find.longitude,
                   ).toFixed(5)})`
                 : null;
               const label = find.location?.trim();
