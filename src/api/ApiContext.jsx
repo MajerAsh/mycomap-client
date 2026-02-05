@@ -8,10 +8,8 @@ export const API = import.meta.env.VITE_API_URL;
 const ApiContext = createContext();
 
 export function ApiProvider({ children }) {
-  //gets current user's auth token from AuthContext
   const { token } = useAuth();
 
-  // Generic API request helper
   const request = async (resource, options = {}, isFormData = false) => {
     const headers = {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -42,8 +40,8 @@ export function ApiProvider({ children }) {
     const list = Array.isArray(tagsToInvalidate)
       ? tagsToInvalidate
       : tagsToInvalidate
-      ? [tagsToInvalidate]
-      : [];
+        ? [tagsToInvalidate]
+        : [];
     list.forEach((tag) => tags[tag]?.());
   };
 
