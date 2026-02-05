@@ -16,7 +16,7 @@ function getErrorMessage(result) {
   return result.error || result.message || JSON.stringify(result);
 }
 
-const ApiContext = createContext();
+const ApiContext = createContext(null);
 
 export function ApiProvider({ children }) {
   const { token } = useAuth();
@@ -43,7 +43,6 @@ export function ApiProvider({ children }) {
     [token],
   );
 
-  //tag-based cache invalidation system:
   const tagsRef = useRef({});
 
   const provideTag = useCallback((tag, query) => {
