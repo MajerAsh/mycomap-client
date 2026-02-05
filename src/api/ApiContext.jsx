@@ -1,6 +1,6 @@
 // API client with auth header support + simple tag invalidation
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef } from "react";
 import { useAuth } from "../auth/AuthContext";
 
 export const API = import.meta.env.VITE_API_URL;
@@ -30,10 +30,10 @@ export function ApiProvider({ children }) {
   };
 
   //tag-based cache invalidation system:
-  const [tags, setTags] = useState({});
+  const tagsRef = useRef({});
 
   const provideTag = (tag, query) => {
-    setTags((prev) => ({ ...prev, [tag]: query }));
+    tagsRef.current[tag] = query;
   };
 
   const invalidateTags = (tagsToInvalidate) => {
@@ -42,7 +42,7 @@ export function ApiProvider({ children }) {
       : tagsToInvalidate
         ? [tagsToInvalidate]
         : [];
-    list.forEach((tag) => tags[tag]?.());
+    list.forEach((tag) => tagsRef.current[tag]?.());
   };
 
   const value = { request, provideTag, invalidateTags };
