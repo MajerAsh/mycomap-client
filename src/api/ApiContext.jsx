@@ -11,6 +11,11 @@ function joinUrl(base, path) {
   return `${b}${p}`;
 }
 
+function getErrorMessage(result) {
+  if (typeof result === "string") return result;
+  return result.error || result.message || JSON.stringify(result);
+}
+
 const ApiContext = createContext();
 
 export function ApiProvider({ children }) {
@@ -32,7 +37,7 @@ export function ApiProvider({ children }) {
       const isJson = /json/.test(response.headers.get("Content-Type") || "");
       const result = isJson ? await response.json() : await response.text();
 
-      if (!response.ok) throw Error(result);
+      if (!response.ok) throw new Error(getErrorMessage(result));
       return result;
     },
     [token],
