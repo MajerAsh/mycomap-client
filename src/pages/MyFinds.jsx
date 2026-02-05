@@ -31,10 +31,8 @@ export default function MyFinds() {
   const badge = myBadge ? BADGE_META[myBadge] : null;
 
   async function handleDelete(findId) {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this find?",
-    );
-    if (!confirm) return;
+    const ok = window.confirm("Are you sure you want to delete this find?");
+    if (!ok) return;
     await deleteFind(null, `/finds/${findId}`);
   }
 
