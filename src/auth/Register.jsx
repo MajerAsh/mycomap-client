@@ -33,7 +33,7 @@ export default function Register() {
         <h1 className="form-title" id="register-title">
           Register for an account
         </h1>
-        <p className="form-instructions" style={{ marginBottom: "1em" }}>
+        <p className="form-instructions">
           Username must be 3-32 characters. Password must be at least 6
           characters.
         </p>
@@ -67,7 +67,7 @@ export default function Register() {
             aria-label="Password"
             disabled={loading}
           />
-          <div style={{ height: "1.1em" }} />
+          <div className="form-spacer" />
           <button
             type="submit"
             className="btn btn--primary"
@@ -79,9 +79,8 @@ export default function Register() {
           {error && (
             <output
               id="register-error"
-              className="error"
+              className="error form-error"
               role="alert"
-              style={{ display: "block", marginTop: "1.5rem" }}
             >
               {error}
             </output>

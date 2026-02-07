@@ -14,6 +14,19 @@
 .form-title {
   margin: 6px 0 10px;
 }
+.form-instructions {
+  margin-bottom: 1em;
+}
+.form-submit {
+  margin-top: 1rem;
+}
+.form-error {
+  display: block;
+  margin-top: 1.5rem;
+}
+.form-spacer {
+  height: 1.1em;
+}
 
 .two-col {
   display: grid;

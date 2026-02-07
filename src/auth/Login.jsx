@@ -58,16 +58,12 @@ export default function Login() {
             type="submit"
             disabled={loading}
             aria-busy={loading}
-            style={{ marginTop: "1rem" }}
+            className="form-submit"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
           {error && (
-            <output
-              className="error"
-              role="alert"
-              style={{ display: "block", marginTop: "1.5rem" }}
-            >
+            <output className="error form-error" role="alert">
               {error}
             </output>
           )}
