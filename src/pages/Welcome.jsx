@@ -176,7 +176,7 @@ export default function Welcome() {
     >
       <h1 id="welcome-title">Welcome to Myco Map</h1>
 
-      {/* Filters */}
+      {/* Filter Map Finds*/}
 
       <form
         className="grid"
