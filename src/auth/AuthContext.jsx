@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { API } from "../api/ApiContext";
+import { apiRequest } from "../api/apiClient";
 
 const AuthContext = createContext();
 
@@ -12,24 +12,18 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   const register = async (credentials) => {
-    const response = await fetch(API + "/users/register", {
+    const result = await apiRequest("/users/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
-    const result = await response.json();
-    if (!response.ok) throw Error(result.error || JSON.stringify(result));
     setToken(result.token);
   };
 
   const login = async (credentials) => {
-    const response = await fetch(API + "/users/login", {
+    const result = await apiRequest("/users/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
-    const result = await response.json();
-    if (!response.ok) throw Error(result.error || JSON.stringify(result));
     setToken(result.token);
   };
 

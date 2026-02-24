@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import { ApiProvider } from "./api/ApiContext.jsx";
+import { ApiProvider } from "./api/ApiContext.jsx"; //stores JWT in sessionStorage
 import App from "./App.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import "mapbox-gl/dist/mapbox-gl.css";

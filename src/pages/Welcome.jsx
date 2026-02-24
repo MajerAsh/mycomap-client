@@ -15,13 +15,13 @@ export default function Welcome() {
 
   // filters
   const [speciesFilter, setSpeciesFilter] = useState("");
-  const [fromDate, setFromDate] = useState(""); // YYYY-MM-DD
-  const [toDate, setToDate] = useState(""); // YYYY-MM-DD
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const { data: finds } = useQuery("/finds", "all-finds");
   const { token } = useAuth();
 
-  // absolute image URL helper 
+  // absolute image URL helper
   const imgSrc = (pathOrUrl) => {
     if (!pathOrUrl) return null;
     return pathOrUrl.startsWith("http")
@@ -95,7 +95,7 @@ export default function Welcome() {
         const coords =
           find.latitude != null && find.longitude != null
             ? `(${Number(find.latitude).toFixed(5)}, ${Number(
-                find.longitude
+                find.longitude,
               ).toFixed(5)})`
             : "";
         const imageHTML = find.image_url
@@ -176,7 +176,7 @@ export default function Welcome() {
     >
       <h1 id="welcome-title">Welcome to Myco Map</h1>
 
-      {/* Filters */}
+      {/* Filter Map Finds*/}
 
       <form
         className="grid"

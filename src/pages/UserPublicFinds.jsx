@@ -1,12 +1,11 @@
 import { useParams } from "react-router";
 import useQuery from "../api/useQuery";
 import SpeciesFacts from "../components/SpeciesFacts";
-//style:
+
 import "../styles/theme.css";
 import "../styles/finds.css";
 
 export default function UserPublicFinds() {
-  // grab finds for a user's username
   const { username } = useParams();
   const {
     data: finds,
